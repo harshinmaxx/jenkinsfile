@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Check out your source code from the repository
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                // Build your Java application (e.g., using Maven)
+                sh 'mvn clean package'
+            }
+        }
+        stage('Test') {
+            steps {
+                // Run tests (e.g., JUnit)
+                sh 'mvn test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                // Deploy your application to a server (e.g., Tomcat)
+                sh 'rsync -avz target/myapp.war user@server:/path/to/deployment/directory/'
+            }
+        }
+    }
+
+    post {
+        success {
+            // Send a notification on success
+            emailext subject: "Build Successful",
+                     body: "Your Jenkins build was successful",
+                     to: 'your@email.com'
+        }
+        failure {
+            // Send a notification on failure
+            emailext subject: "Build Failed",
+                     body: "Your Jenkins build failed",
+                     to: 'your@email.com'
+        }
+    }
+}
